@@ -13,8 +13,10 @@ Currently configured for Cook County, IL, USA.
 
 * Installation
 
-First, update =Makefile= to change =bindir= to a place on your path
-(or add =$HOME/bin= to your path)... then,
+First, install [[https://github.com/borkdude/babashka][Babashka]].
+
+Then, update =Makefile= to change =bindir= to a place on your path
+(or add =$HOME/bin= to your path).... finally,
 
 #+BEGIN_SRC
 make
