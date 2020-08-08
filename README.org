@@ -2,11 +2,6 @@
 #+DATE: <2020-08-08 Sat>
 #+OPTIONS: toc:nil num:nil
 
-# Put tag(s) here, bracketed by colons:
-* ::
-
-* covid19
-
 [[https://github.com/borkdude/babashka][Babashka]] script to show COVID19 case rates.
 
 Currently configured for Cook County, IL, USA.
