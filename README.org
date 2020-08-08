@@ -4,7 +4,7 @@
 
 [[https://github.com/borkdude/babashka][Babashka]] script to show COVID19 case rates.
 
-Currently configured for Cook County, IL, USA.
+Currently works for US only... PRs welcome.
 
 * Installation
 
