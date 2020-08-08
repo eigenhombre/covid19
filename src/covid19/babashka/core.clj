@@ -1,7 +1,8 @@
 (ns covid19.babashka.core
   (:require [babashka.curl :as curl]
             [clojure.data.csv :as csv]
-            [clojure.string :as string]))
+            [clojure.string :as string])
+  (:import [java.time LocalDate]))
 
 (def csv-url (str "https://raw.githubusercontent.com/"
                   "CSSEGISandData/COVID-19/master/"
@@ -60,7 +61,7 @@
         weekly-deltas (map (comp (partial apply -)
                                  (juxt last first))
                            weeks)]
-    (println "Starting Jan. 22")
+    (println "Data starts 2020-01-22; today's date:" (str (LocalDate/now)))
     (println "Weeks:")
     (println (table-str (concat [["W" "Th" "F" "Sa" "Su" "M" "Tu"]
                                  ["--" "--" "--" "--" "--" "--" "--"]]
