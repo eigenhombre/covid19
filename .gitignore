@@ -1,4 +1,5 @@
 *.class
+*.html
 *.jar
 .hg/
 .hgignore
@@ -7,5 +8,7 @@
 /checkouts
 /classes
 /target
+covid19
 pom.xml
 pom.xml.asc
+uberscript

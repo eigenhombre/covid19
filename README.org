@@ -1,0 +1,49 @@
+#+TITLE: COVID19 case rate script
+#+DATE: <2020-08-08 Sat>
+#+OPTIONS: toc:nil num:nil
+
+# Put tag(s) here, bracketed by colons:
+* ::
+
+* covid19
+
+[[https://github.com/borkdude/babashka][Babashka]] script to show COVID19 case rates.
+
+Currently tuned for Cook County, IL, USA.
+
+* Installation
+
+First, update =Makefile= to change =bindir= to a place on your path
+(or add =$HOME/bin= to your path)... then,
+
+#+BEGIN_SRC
+make
+make install
+#+END_SRC
+
+* Usage
+
+=covid19=
+
+* TO DO
+- Accept any County/Location
+- Use NY Times dataset?
+
+* License
+
+Copyright © 2020 John Jacobsen
+
+Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.
+
+Running this script makes use of the [[https://github.com/CSSEGISandData/COVID-19][Johns Hopkins COVID-19 dataset]].
+See that repo for terms of use.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
