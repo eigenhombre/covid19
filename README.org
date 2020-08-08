@@ -24,7 +24,7 @@ make install
 * Example Usage
 
 #+BEGIN_SRC
-$ covid19
+$ covid19 US Illinois Cook
 Data starts 2020-01-22; today's date: 2020-08-08
 Weeks:
      W     Th      F     Sa     Su      M     Tu
@@ -103,12 +103,6 @@ Weekly new:
 2690 2802  3317 3743
 1577    ?     ?    ?
 #+END_SRC
-
-
-
-* TO DO
-- Accept any County/Location
-- Use NY Times dataset?
 
 * License
 
