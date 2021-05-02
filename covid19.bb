@@ -65,6 +65,19 @@
                       (format (format "%%%ds" (nth col-lengths c))
                               (nth r c "?"))))))))
 
+(defn write-gnuplot! [filename]
+  (spit "/tmp/plotit.gnu" (format "
+set term png enhanced font 'Verdana,10'
+set output '/tmp/covid19.png'
+set xdata time
+set timefmt \"%%Y-%%m-%%d\"
+set format x \"%%Y-%%m-%%d\"
+set xtics rotate
+set style line 1 linecolor rgb '#0060ad' linetype 1 linewidth 2
+set style line 2 linecolor rgb '#dd181f' linetype 1 linewidth 2
+plot '%s' using 1:2 with lines linestyle 1
+" filename)))
+
 (def usage
   "Usage:
 
@@ -115,6 +128,7 @@ Options:
                                        (partition-all 7)))))
       (println "\nWeekly new:\n")
       (printf "%s %15s\n" "Week Starting" "Case Count")
+
       (let [out (str
                  (clojure.string/join
                   "\n"
@@ -128,17 +142,7 @@ Options:
         (println filename)
         (spit filename out)
 
-        (spit "/tmp/plotit.gnu" (format "
-set term png enhanced font 'Verdana,10'
-set output '/tmp/covid19.png'
-set xdata time
-set timefmt \"%%Y-%%m-%%d\"
-set format x \"%%Y-%%m-%%d\"
-set xtics rotate
-set style line 1 linecolor rgb '#0060ad' linetype 1 linewidth 2
-set style line 2 linecolor rgb '#dd181f' linetype 1 linewidth 2
-plot '%s' using 1:2 with lines linestyle 1
-" filename))
+        (write-gnuplot! filename)
         (prn (clojure.java.shell/sh
               "gnuplot"
               :in (clojure.java.io/file "/tmp/plotit.gnu")))
