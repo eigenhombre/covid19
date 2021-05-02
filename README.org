@@ -10,18 +10,21 @@ Currently works for US only... PRs welcome.
 
 First, install [[https://github.com/borkdude/babashka][Babashka]].
 
-Then, update =Makefile= to change =bindir= to a place on your path
-(or add =$HOME/bin= to your path).... finally,
+Then,
 
 #+BEGIN_SRC
-make
-make install
+./covid19.bb US <State> <County>
+
+# or
+
+./covid19.bb -h   # for more options.
 #+END_SRC
+
 
 * Example Usage
 
 #+BEGIN_SRC
-$ covid19 US Illinois Cook
+$ ./covid19.bb US Illinois Cook
 Data starts 2020-01-22; today's date: 2020-08-08
 Weeks:
      W     Th      F     Sa     Su      M     Tu
