@@ -1,25 +1,30 @@
 #!/usr/bin/env bb
 
-(ns covid19.babashka.core
-  (:require [babashka.curl :as curl]
-            [clojure.data.csv :as csv]
-            [clojure.string :as string])
-  (:import [java.time LocalDate]))
+(deps/add-deps
+ '{:deps {nubank/docopt {:git/url "https://github.com/nubank/docopt.clj"
+                         :sha "1bdce964acfe5b88f22cfa6cb534f9da37e7e9ce"}}})
+
+(require '[babashka.curl :as curl]
+         '[clojure.data.csv :as csv]
+         '[clojure.string :as string]
+         '[docopt.core :as docopt])
+(import '[java.time LocalDate])
 
 (def csv-url (str "https://raw.githubusercontent.com/"
                   "CSSEGISandData/COVID-19/master/"
                   "csse_covid_19_data/csse_covid_19_time_series/"
                   "time_series_covid19_confirmed_US.csv"))
 
-;; Don't fetch this over and over again when reloading file in REPL:
-(defonce rawdata (->> csv-url
-                      curl/get
-                      :body))
+(defn rawdata [verbose]
+  (when verbose
+    (println "Data URL:" csv-url))
+  (->> csv-url
+       curl/get
+       :body))
 
 (def t0 (LocalDate/parse "2020-01-22"))
 
-(defn normalize-records
-  [raw]
+(defn normalize-records [raw]
   (let [[headers & rows] (csv/read-csv raw)]
     (for [r rows]
       (do
@@ -32,14 +37,15 @@
                (zipmap (take 11 (map keyword headers))
                        (take 11 r)))))))
 
-(defn selected-rows [& filters]
+(defn selected-rows [verbose & filters]
   (reduce (fn [acc f]
             (filter f acc))
-          (normalize-records rawdata)
+          (normalize-records (rawdata verbose))
           filters))
 
-(defn cook-cases [{:keys [region state locale]}]
-  (selected-rows (comp (partial = region) :Country_Region)
+(defn cook-cases [{:keys [verbose region state locale]}]
+  (selected-rows verbose
+                 (comp (partial = region) :Country_Region)
                  (comp (partial = state) :Province_State)
                  (comp (partial = locale) :Admin2)))
 
@@ -59,23 +65,42 @@
                       (format (format "%%%ds" (nth col-lengths c))
                               (nth r c "?"))))))))
 
-(defn -main [& [region state locale]]
-  (if-not (and region state locale)
-    (println (str "Usage: covid19 "
-                  "<region-or-country> "
-                  "<province-or-state> "
-                  "<county-or-locale>"))
+(def usage
+  "Usage:
+
+    covid19.bb [--verbose] [--cumulative] <region> <state> <locale>
+
+Example:
+
+    covid19.bb US Illinois Cook
+
+Options:
+
+    -h --help        Show this help screen
+    -v --verbose     Show more output
+    -c --cumulative  Show cumulative numbers by day/week
+")
+
+(defn -main [{:strs [<region> <state> <locale>
+                     --verbose
+                     --cumulative]}]
+  (if-not (and <region> <state> <locale>)
+    (println usage)
     (let [daily-cases
-          (->> (cook-cases {:region region, :state state, :locale locale})
+          (->> (cook-cases {:region <region>
+                            :state <state>
+                            :locale <locale>
+                            :verbose --verbose})
                first
                :days
                (map (juxt :day (comp int :n))))
           weeks (partition-all 7 daily-cases)]
       (println "Data starts 2020-01-22; today's date:" (str (LocalDate/now)))
-      (println "Weeks:")
-      (println (table-str (concat [["W" "Th" "F" "Sa" "Su" "M" "Tu"]
-                                   ["--" "--" "--" "--" "--" "--" "--"]]
-                                  (map (partial map second) weeks))))
+      (when --cumulative
+        (println "Cumulative Totals By Day/Week")
+        (println (table-str (concat [["W" "Th" "F" "Sa" "Su" "M" "Tu"]
+                                     ["--" "--" "--" "--" "--" "--" "--"]]
+                                    (map (partial map second) weeks)))))
       (println "\nSeven day average of daily increase:\n")
       (println (table-str (concat [["W" "Th" "F" "Sa" "Su" "M" "Tu"]
                                    ["--" "--" "--" "--" "--" "--" "--"]]
@@ -93,14 +118,14 @@
       (let [out (str
                  (clojure.string/join
                   "\n"
-                  (for [w (butlast weeks)]
+                  (for [w weeks]
                     (let [[[fd fn] [ld ln]] [(first w) (last w)]]
                       (format "%s %15d"
                               fd (- ln fn)))))
                  "\n")
             filename (format "/tmp/covid19-%s-%s-%s.dat"
-                             region state locale)]
-        (println out)
+                             <region> <state> <locale>)]
+        (println filename)
         (spit filename out)
 
         (spit "/tmp/plotit.gnu" (format "
@@ -117,7 +142,9 @@ plot '%s' using 1:2 with lines linestyle 1
         (prn (clojure.java.shell/sh
               "gnuplot"
               :in (clojure.java.io/file "/tmp/plotit.gnu")))
-        (clojure.java.shell/sh "open" "/tmp/covid19.png")))))
+        (println "open /tmp/covid19.png")
+        #_(clojure.java.shell/sh "open" "/tmp/covid19.png")))))
 
-(ns user (:require [covid19.babashka.core]))
-(apply covid19.babashka.core/-main *command-line-args*)
+(docopt/docopt usage
+               *command-line-args*
+               -main)
